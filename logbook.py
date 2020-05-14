@@ -10,7 +10,7 @@ import tkinter as tk
 from tkinter import filedialog
 import tkinter.ttk as ttk
 
-import psycopg2
+import sqlite3
 
 db_name = ''
 db_user = ''
@@ -23,13 +23,13 @@ db_host = ''
 ###############
 
 def create_database_window():
-    
+
     cd_window = tk.Tk()
     cd_window.title('Create Database')
     cd_frame = CreateDatabaseWindow(cd_window)
     cd_frame.pack()
-    
-def create_database
+
+##def create_database
 
 ###############
 ##  Classes  ##
@@ -39,12 +39,12 @@ class Airport(object):
 
     def __init__(self):
         pass
-        
+
 class Aircraft(object):
 
     def __init__(self):
         pass
-        
+
 ##########################
 ## Main Application GUI ##
 ##########################
@@ -66,7 +66,7 @@ class Menubar(tk.Menu):
     def __init__(self, master= None, *args, **kwargs):
         super().__init__(master= master)
         self.create_menus()
-    
+
     def create_menus(self):
     # File Menu Commands
         self.fileMenu = tk.Menu(self, tearoff= 0)
@@ -92,23 +92,23 @@ class Menubar(tk.Menu):
 
 
 class LoginPage(ttk.Frame):
-    
+
     def __init__(self, master= None):
         super().__init__(master= master)
-        
+
 
 class Dashboard(ttk.Frame):
-    
+
     def __init__(self, master= None):
         super().__init__(master= master)
-        
+
 
 class CreateDatabaseWindow(ttk.Frame):
 
     def __init__(self, master= None):
         super().__init__(master= master)
         self.create_widgets()
-    
+
     def create_widgets(self):
         self.db_name_label = ttk.Label(self, text= "Name")
         self.db_name_label.pack()
