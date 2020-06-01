@@ -1,1 +1,2 @@
-env-logbook
+venv
+**/__pycache__

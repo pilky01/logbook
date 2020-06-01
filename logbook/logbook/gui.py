@@ -1,26 +1,10 @@
-#!/usr/bin/python3
-
-##############################################################################
-## 
-## 
-## 
-##############################################################################
+#!/usr/bin/env python3
 
 import tkinter as tk
 from tkinter import filedialog
 import tkinter.ttk as ttk
 
-import sqlite3
-
-db_name = ''
-db_user = ''
-db_password = ''
-db_host = ''
-
-
-###############
-## Functions ##
-###############
+root = tk.Tk()
 
 def create_database_window():
 
@@ -28,28 +12,6 @@ def create_database_window():
     cd_window.title('Create Database')
     cd_frame = CreateDatabaseWindow(cd_window)
     cd_frame.pack()
-
-##def create_database
-
-###############
-##  Classes  ##
-###############
-
-class Airport(object):
-
-    def __init__(self):
-        pass
-
-class Aircraft(object):
-
-    def __init__(self):
-        pass
-
-##########################
-## Main Application GUI ##
-##########################
-
-root = tk.Tk()
 
 
 class Application(ttk.Frame):
@@ -59,6 +21,7 @@ class Application(ttk.Frame):
         self.pack()
         self.config(width= 680)
 ##        self.createApplication()
+
 
 
 class Menubar(tk.Menu):
@@ -119,18 +82,9 @@ class CreateDatabaseWindow(ttk.Frame):
         self.cancel_button = ttk.Button(self, text= "Cancel",
                                         command= self.master.destroy)
         self.cancel_button.pack()
-
-
-########################
-## Root Window Config ##
-########################
-
+        
+## Main Gui Window Config
 root.title('Logbook')
 root.geometry("300x300")
 programMenu = Menubar(root)
 root.config(menu = programMenu)
-
-if __name__ == '__main__':
-
-    app = Application(root)
-    app.mainloop()
