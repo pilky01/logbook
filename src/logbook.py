@@ -34,6 +34,7 @@ if __name__ == '__main__':
 
     app = gui.Application(gui.root)
     app.mainloop()
+    
 def main():
     pass
 
