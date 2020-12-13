@@ -7,8 +7,8 @@
 ##############################################################################
 
 
-from . import logbook_gui as gui
-from . import logbook_db as db
+from logbook_gui import logbook_gui as gui
+from logbook_db import logbook_db as db
 
 
 ###############
@@ -28,15 +28,10 @@ class Aircraft(object):
 ##########################
 ## Main Application GUI ##
 ##########################
-
-
-if __name__ == '__main__':
-
-    app = gui.Application(gui.root)
-    app.mainloop()
     
 def main():
-    pass
+    app = gui.Application(gui.root)
+    app.mainloop()
 
-if __name__ == ""__main__":
+if __name__ == "__main__":
     main()
