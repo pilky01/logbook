@@ -7,7 +7,8 @@
 ##############################################################################
 
 
-from logbook import gui, db
+from . import logbook_gui as gui
+from . import logbook_db as db
 
 
 ###############
@@ -33,3 +34,8 @@ if __name__ == '__main__':
 
     app = gui.Application(gui.root)
     app.mainloop()
+def main():
+    pass
+
+if __name__ == ""__main__":
+    main()
