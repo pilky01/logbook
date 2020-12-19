@@ -9,7 +9,7 @@ import logbook_db as db
 
 class Application(ttk.Frame):
 
-    def __init__(self, master= None, *args, **kwargs):
+    def __init__(self, master = None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.pack()
         self.config(width = 680)
@@ -66,7 +66,7 @@ class FlightRecordWindow(BaseRecordWindow):
         self.origin_entry = ttk.Entry(self, state = "readonly")
         self.origin_entry.pack()
         self.origin_select = ttk.Button(self, text = "Select...",
-                            command = lambda: self.origin_select_window())
+                                command = lambda: self.origin_select_window())
         self.origin_select.pack()
 #        self.date
         self.save_button = ttk.Button(self, text = "Save")
@@ -75,34 +75,62 @@ class FlightRecordWindow(BaseRecordWindow):
         self.cancel_button.pack()
         
     def origin_select_window(self):
-    ##need to select class of SelectWindow
         origin_select_window = OriginSelectWindow(self, source = "origin")
         origin_select_window.title("Select Origin...")
-        origin_select_window.geometry("500x350")
+        #origin_select_window.geometry("500x350")
 
 class BaseSelectWindow(tk.Toplevel):
     
     def __init__(self, master = None, source = None, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.configure(padx = 5, pady = 3)
         self.source = source
         self.search_results = []
         self.create_base_widgets()
     
     def create_base_widgets(self):
-        # input frame
-        self.input_frame = ttk.Frame(self)
-        self.input_frame.pack()
+        #frames
+        self.input_frame = ttk.Frame(self, padding = 2)
+        self.input_frame.grid(row = 0, column = 0, columnspan = 2,
+                              sticky = "nsew")
+        self.select_list_frame = ttk.Frame(self, padding = 2)
+        self.select_list_frame.grid(row = 1, column = 0, rowspan = 2,
+                                    columnspan = 1, sticky = "nsew")
+        self.info_frame = ttk.Frame(self, borderwidth = 2, padding = 2)
+        self.info_frame.grid(row = 1, column = 1, columnspan = 1,
+                             sticky = "nsew")
+        self.confirmation_frame = ttk.Frame(self, borderwidth = 2,
+                                            padding = 7)
+        self.confirmation_frame.grid(row = 2, column = 1, columnspan = 1,
+                                     sticky = "s")
+        self.columnconfigure(0, weight = 1)
+        self.columnconfigure(1, weight = 1)
+        self.rowconfigure(2, weight = 1)
+        # input frame contents        
         self.select_entry = ttk.Entry(self.input_frame)
-        self.select_entry.pack()
+        self.select_entry.pack(side = "left", expand = "true", fill = tk.BOTH,
+                               padx = (0,5))
         self.select_button = ttk.Button(self.input_frame, text = "Search", 
                                        command = lambda: self.search_update())
-        self.select_button.pack()
+        self.select_button.pack(side = "left")
         # results
-        self.select_list = tk.Listbox(self)
-        self.select_list.pack()
-        # result info
-        self.info_frame = ttk.Frame(self)
-        self.info_frame.pack()
+        self.select_list = tk.Listbox(self.select_list_frame)
+        self.select_list.pack(side = "left", expand = "true", fill = tk.BOTH)
+        self.select_scroller = ttk.Scrollbar(self.select_list_frame,
+                                             command = self.select_list.yview)
+        self.select_scroller.pack(side = "right", fill = "y")
+        self.select_list.config(yscrollcommand = self.select_scroller.set)
+        # confirmation buttons
+        self.ok_button = ttk.Button(self.confirmation_frame, text = "Select",
+                                    padding = 3)
+#        self.ok_button.configure(padx = 3, pady = 3)
+        self.ok_button.pack(side = "right", padx = (2,0))
+        self.cancel_button = ttk.Button(self.confirmation_frame,
+                                        text = "Cancel",
+                                        command = self.destroy)
+        self.cancel_button.pack(side = "right", padx = (0,2))
+        
+
     
     def search_update(self):
         self.select_list.delete(0, tk.END)
@@ -118,14 +146,29 @@ class OriginSelectWindow(BaseSelectWindow):
     def __init__(self, master = None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.create_custom_widgets()
+        self.select_list.bind("<<ListboxSelect>>", self.select_list_update)
     
     def create_custom_widgets(self):
-        self.name_label_var = tk.StringVar()
-        self.name_label = ttk.Label(self.info_frame,
-                                    text = self.name_label_var).pack()
-        self.icaocode_label_var = tk.StringVar()
-        self.icaocode_label = ttk.Label(self.info_frame,
-                                        text = self.icaocode_label_var).pack()
-        self.iatacode_label_var = tk.StringVar()
-        self.iatacode_label = ttk.Label(self.info_frame,
-                                        text = self.iatacode_label_var).pack()
+        self.label_name = ttk.Label(self.info_frame,
+                                    text = "Airport Name : ")
+        self.label_name.pack(anchor = "w")
+        self.name_label = ttk.Label(self.info_frame, wraplength = 200)
+        self.name_label.pack()
+        self.label_icaocode = ttk.Label(self.info_frame,
+                                        text = "ICAO Code : ")
+        self.label_icaocode.pack(anchor = "w")
+        self.icaocode_label = ttk.Label(self.info_frame)
+        self.icaocode_label.pack()
+        self.label_iatacode = ttk.Label(self.info_frame,
+                                        text = "IATA Code : ")
+        self.label_iatacode.pack(anchor = "w")
+        self.iatacode_label = ttk.Label(self.info_frame)
+        self.iatacode_label.pack()
+                                        
+    def select_list_update(self, event):
+        selection = event.widget.curselection()
+        index = selection[0]
+        data = self.search_results[index]        
+        self.name_label.configure(text = data[1])
+        self.icaocode_label.configure(text = data[2])
+        self.iatacode_label.configure(text = data[3])
