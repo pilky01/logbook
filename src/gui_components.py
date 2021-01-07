@@ -5,41 +5,59 @@ import tkinter.ttk as ttk
 
 from tkcalendar import Calendar, DateEntry
 
-def example1():
-    def print_sel():
-        print(cal.selection_get())
 
-    top = tk.Toplevel(root)
-
-    cal = Calendar(top,
-                   font="Arial 14", selectmode='day',
-                   cursor="hand1", year=2018, month=2, day=5)
-    cal.pack(fill="both", expand=True)
-    ttk.Button(top, text="ok", command=print_sel).pack()
-
-def example2():
-    def print_sel():
-        print(str(cal.get()))
-        
-        
-    top = tk.Toplevel(root)
-
-    ttk.Label(top, text='Choose date').pack(padx=10, pady=10)
-
-    cal = DateEntry(top, width=12, background='darkblue',
-                    foreground='white', borderwidth=2)
-    cal.pack(padx=10, pady=10)
+class TimePicker(ttk.Frame):
     
-    but = ttk.Button(top, text = "print", command=print_sel).pack()
+    def __init__(self, master = None, *args, **kwargs):
+        super().__init__(master, *args, **kwargs)
+        self.master = master
+        self.create_widgets()
+    
+    def create_widgets(self):
+        self.hour_spinbox = ttk.Spinbox(self, from_ = 0, to = 23, width = 2,
+                                        wrap = "true", format = "%02.f",
+                                        increment = 1)
+        self.hour_spinbox.grid(row = 0, column = 0)
+        self.minute_spinbox = ttk.Spinbox(self, from_ = 0, to = 59, width = 2,
+                                        wrap = "true", format = "%02.f",
+                                        increment = 1)
+        self.minute_spinbox.grid(row = 0, column = 1)
 
-root = tk.Tk()
-s = ttk.Style(root)
-s.theme_use('clam')
+#def example1():
+#    def print_sel():
+#        print(cal.selection_get())
 
-ttk.Button(root, text='Calendar', command=example1).pack(padx=10, pady=10)
-ttk.Button(root, text='DateEntry', command=example2).pack(padx=10, pady=10)
+#    top = tk.Toplevel(root)
 
-root.mainloop()
+#    cal = Calendar(top,
+#                   font="Arial 14", selectmode='day',
+#                   cursor="hand1", year=2018, month=2, day=5)
+#    cal.pack(fill="both", expand=True)
+#    ttk.Button(top, text="ok", command=print_sel).pack()
+
+#def example2():
+#    def print_sel():
+#        print(str(cal.get()))
+#        
+#        
+#    top = tk.Toplevel(root)
+
+#    ttk.Label(top, text='Choose date').pack(padx=10, pady=10)
+
+#    cal = DateEntry(top, width=12, background='darkblue',
+#                    foreground='white', borderwidth=2)
+#    cal.pack(padx=10, pady=10)
+#    
+#    but = ttk.Button(top, text = "print", command=print_sel).pack()
+
+#root = tk.Tk()
+#s = ttk.Style(root)
+#s.theme_use('clam')
+
+#ttk.Button(root, text='Calendar', command=example1).pack(padx=10, pady=10)
+#ttk.Button(root, text='DateEntry', command=example2).pack(padx=10, pady=10)
+
+#root.mainloop()
 
 #import tkinter as tk
 
