@@ -11,10 +11,13 @@ def search_selection(term, source):
                                   FROM airports WHERE name LIKE ?;''',
                     "destination" : '''SELECT id, name, icao_code, iata_code
                                   FROM airports WHERE name LIKE ?;''',
+                    "aircraft" : '''SELECT id, registration, type
+                                   FROM aircraft WHERE registration LIKE ?;''',
                    }
     term_string = "%"+term+"%"
     dbcon = sqlite3.connect(db_path)
-    result = dbcon.execute(source_dict[source], (term_string,)).fetchall()
+    dbcon.row_factory = sqlite3.Row
+    cursor = dbcon.cursor()
+    result = cursor.execute(source_dict[source], (term_string,)).fetchall()
     dbcon.close()
-    
     return result

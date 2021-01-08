@@ -61,13 +61,11 @@ class Taskbar(ttk.Frame):
         self.function_newcrew.grid(row = 0, column = 3)
         
     def new_flight_record(self):
-        self.record_window = FlightRecordWindow(self,
-                                      record_data = [None for i in range(26)])
+        self.record_window = FlightRecordWindow(self)
         self.record_window.title("New Flight")
     
     def new_aircraft(self):
-        self.aircraft_window = AircraftRecordWindow(self,
-                                      record_data = [None for i in range (7)])
+        self.aircraft_window = AircraftRecordWindow(self)
         self.aircraft_window.title("New Aircraft")
 
 
@@ -75,20 +73,14 @@ class Dashboard(ttk.Frame):
 
     def __init__(self, master = None, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
-        
-class BaseRecordWindow(tk.Toplevel):
-    
-    def __init__(self, master = None, record_data = [], *args, **kwargs):
-        super().__init__(master, *args, **kwargs)
-        self.master = master
-        self.record_data = record_data
 
 
-class FlightRecordWindow(BaseRecordWindow):
+class FlightRecordWindow(tk.Toplevel):
     
     def __init__(self, master, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
         self.master = master
+        self.record_data = [None for i in range(26)]
         self.create_record_widgets()
         
     def create_record_widgets(self):
@@ -193,18 +185,23 @@ class FlightRecordWindow(BaseRecordWindow):
                                                      text = "Registration:")
         self.aircraft_registration_label.grid(row = 1, column = 0,
                                               sticky = "ew")
-        self.aircraft_registration = ttk.Label(self.aircraft_data_frame)
+        self.registration_var = tk.StringVar(self)
+        self.aircraft_registration = ttk.Label(self.aircraft_data_frame,
+                                         textvariable = self.registration_var)
         self.aircraft_registration.grid(row = 2, column = 0)
         self.aircraft_type_label = ttk.Label(self.aircraft_data_frame,
                                              text = "Type:")
         self.aircraft_type_label.grid(row = 3, column = 0, sticky = "ew")
-        self.aircraft_type = ttk.Label(self.aircraft_data_frame)
+        self.type_var = tk.StringVar(self)
+        self.aircraft_type = ttk.Label(self.aircraft_data_frame,
+                                       textvariable = self.type_var)
         self.aircraft_type.grid(row = 4, column = 0)
         self.aircraft_multi_label = ttk.Label(self.aircraft_data_frame,
                                               text = "Multi-engine")
         self.aircraft_multi_label.grid(row = 5, column = 0)
         self.aircraft_multi_label_check =\
-                                     tk.Checkbutton(self.aircraft_data_frame)
+                                     tk.Checkbutton(self.aircraft_data_frame,
+                                                    state = "disabled")
         self.aircraft_multi_label_check.grid(row = 5, column = 1,
                                              sticky = "e")
         self.aircraft_select_button = ttk.Button(self.aircraft_data_frame,
@@ -251,27 +248,34 @@ class FlightRecordWindow(BaseRecordWindow):
         
     def create_origin_select_window(self):
         self.origin_select_window = AirfieldSelectWindow(self,
-                                            source = "origin", listindex = 1,
-                                            return_variable = self.origin_var)
+                                         source = "origin", listindex = 1,
+                                         results_key = 'name',
+                                         return_variables = [self.origin_var])
         self.origin_select_window.title("Select Origin...")
         #origin_select_window.geometry("500x350")
     
     def create_destination_select_window(self):
         self.destination_select_window = AirfieldSelectWindow(self,
-                                       source = "destination", listindex = 2,
-                                       return_variable = self.destination_var)
+                                    source = "destination", listindex = 2,
+                                    results_key = 'name',
+                                    return_variables = [self.destination_var])
         self.destination_select_window.title("Select Destination...")
     
     def create_aircraft_select_window(self):
-        self.aircraft_select_window = AircraftSelectWindow(self,)
+        self.aircraft_select_window = AircraftSelectWindow(self,
+                                    source = "aircraft", listindex = 5,
+                                    results_key = 'registration',
+                                    return_variables = [self.registration_var,
+                                                        self.type_var])
         self.aircraft_select_window.title("Select Aircraft...")
 
 
-class AircraftRecordWindow(BaseRecordWindow):
+class AircraftRecordWindow(tk.Toplevel):
 
     def __init__(self, master = None, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
         self.master = master
+        self.record_data = [None for i in range (7)]
         self.create_widgets()
         
     def create_widgets(self):
@@ -284,15 +288,16 @@ class AircraftRecordWindow(BaseRecordWindow):
 
 class BaseSelectWindow(tk.Toplevel):
     
-    def __init__(self, master = None, source = None, return_variable = None,
-                 listindex = None, *args, **kwargs):
+    def __init__(self, master = None, source = None, return_variables = [],
+                 listindex = None, results_key = None, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
         self.configure(padx = 10, pady = 10)
         self.master = master
         self.source = source
-        self.return_variable = return_variable
+        self.return_variables = return_variables
         self.listindex = listindex
-        self.search_results = []
+        self.results_key = results_key
+        self.search_results = None
         self.create_base_widgets()
     
     def create_base_widgets(self):
@@ -341,14 +346,15 @@ class BaseSelectWindow(tk.Toplevel):
         self.search_results = db.search_selection(self.select_entry.get(),
                                                   self.source)
         for result in self.search_results:
-            self.select_list.insert(tk.END, result[1])
+            self.select_list.insert(tk.END, result[self.results_key])
         print(self.search_results)
     
     def confirm_selection(self):
         if self.select_list.curselection():
             int_select = self.select_list.curselection()
             selection_string = self.select_list.get(int_select)
-            self.return_variable.set(selection_string)
+            for return_variable in self.return_variables:
+                return_variable.set(selection_string)
             # insert selection id into list position
             self.master.record_data[self.listindex] =\
                                          self.search_results[int_select[0]][0]
@@ -395,9 +401,9 @@ class AirfieldSelectWindow(BaseSelectWindow):
         else:
             index = selection[0]
             data = self.search_results[index]        
-            self.name_label.configure(text = data[1])
-            self.icaocode_label.configure(text = data[2])
-            self.iatacode_label.configure(text = data[3])
+            self.name_label.configure(text = data['name'])
+            self.icaocode_label.configure(text = data['icao_code'])
+            self.iatacode_label.configure(text = data['iata_code'])
 
 
 class AircraftSelectWindow(BaseSelectWindow):
@@ -405,4 +411,13 @@ class AircraftSelectWindow(BaseSelectWindow):
     def __init__(self, master = None, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
         self.master = master
-        
+        self.create_custom_widgets()
+        self.select_list.bind("<<ListboxSelect>>", self.select_list_update)
+    
+    def create_custom_widgets(self):
+        pass
+    
+    def select_list_update(self, event):
+        selection = event.widget.curselection()
+        if len(selection) == 0:
+            pass
