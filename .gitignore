@@ -1,4 +1,5 @@
 .gitignore
 scripts
+fragments
 venv
 **/__pycache__
